@@ -21,10 +21,21 @@ def find_bundled_clang_format():
     return None
 
 
+def find_system_clang_format():
+    exe = "clang-format.exe" if platform.system() == "Windows" else "clang-format"
+    for path in os.environ["PATH"].split(os.pathsep):
+        full_path = os.path.join(path, exe)
+        if os.path.exists(full_path):
+            return full_path
+    return None
+
+
 def main():
     clang_format = find_bundled_clang_format()
     if not clang_format:
-        sys.stderr.write("Could not locate bundled clang-format\n")
+        clang_format = find_system_clang_format()
+    if not clang_format:
+        sys.stderr.write("Could not locate bundled or installed clang-format\n")
         sys.exit(1)
 
     # Example call-through:
